@@ -15,23 +15,35 @@ st.set_page_config(page_title="KSU_IDEATHON_3TEAM", layout="centered", initial_s
 
 st.markdown("""
 <style>
-    /* 기본 배경 및 폰트 */
-    .stApp { background-color: #F0F2F6; }
+    /* 기본 배경 및 스크롤바 숨기기 */
+    .stApp { background-color: #F0F2F6; overflow-x: hidden; }
     p, h1, h2, h3, h4, h5, h6 { color: #111111 !important; }
     header {visibility: hidden;} footer {visibility: hidden;}
     a.header-anchor, .stMarkdown a, svg[title="Link to this heading"] { display: none !important; visibility: hidden !important; pointer-events: none !important; }
     
-    /* PC 환경에서 스마트폰처럼 보이게 하는 프레임 */
+    /* 화면 너비 제한 및 테두리 (PC에서는 폰처럼, 폰에서는 꽉 차게) */
     .block-container {
         background-color: #FFFFFF; color: #111111;
-        max-width: 410px !important; margin: 20px auto; border-radius: 40px;
-        box-shadow: 0px 10px 30px rgba(0,0,0,0.1); padding: 1.5rem 1.5rem 0 1.5rem !important; 
-        border: 8px solid #E0E0E0; overflow: hidden; 
+        width: 100% !important;
+        max-width: 410px !important; 
+        margin: 20px auto !important; 
+        border-radius: 40px;
+        box-shadow: 0px 10px 30px rgba(0,0,0,0.1); 
+        padding: 1.5rem 1rem 0 1rem !important; 
+        border: 8px solid #E0E0E0; 
     }
     
-    div[data-testid="stVerticalBlockBorderWrapper"] > div::-webkit-scrollbar { display: none; }
-    div[data-testid="stVerticalBlockBorderWrapper"] > div { -ms-overflow-style: none; scrollbar-width: none; }
-    
+    /* 모바일(아이폰 SE 등 작은 화면) 접속 시 여백, 테두리 없애서 화면에 딱 맞게 */
+    @media (max-width: 450px) {
+        .block-container {
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            padding: 1rem 0.5rem 0 0.5rem !important;
+        }
+    }
+
     .light-card { background-color: #F9F9FB; padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #EFEFEF; }
     .app-title { text-align: center; margin-top: 40px; margin-bottom: 40px; color: #111; font-size: 24px !important; font-weight: 900; white-space: nowrap; letter-spacing: -0.5px; }
 
@@ -42,48 +54,28 @@ st.markdown("""
     .stButton > button[kind="secondary"] { background-color: #E2E6EA !important; color: #111111 !important; border: none !important; }
     .stButton > button[kind="secondary"] p { color: #111111 !important; margin: 0 !important; }
 
-    /* 달력 동그라미 버튼 스타일 */
-    div[data-testid="stHorizontalBlock"]:has(> div:nth-child(7)) { gap: 0 !important; }
-    div[data-testid="stHorizontalBlock"]:has(> div:nth-child(7)) div[data-testid="column"] { padding: 0 1px !important; min-width: 0 !important; }
+    /* [해결1] 달력 동그라미 버튼 반응형 조절 (좌우 스크롤 완벽 방지) */
+    div[data-testid="stHorizontalBlock"]:has(> div:nth-child(7)) { gap: 2px !important; flex-wrap: nowrap !important; }
+    div[data-testid="stHorizontalBlock"]:has(> div:nth-child(7)) div[data-testid="column"] { padding: 0 !important; min-width: 0 !important; width: 100% !important; }
     div[data-testid="stHorizontalBlock"]:has(> div:nth-child(7)) .stButton > button {
-        background-color: #F0F5FA !important; border-radius: 50% !important; width: 38px !important; height: 38px !important; min-height: 38px !important;
+        background-color: #F0F5FA !important; border-radius: 50% !important; 
+        width: 100% !important; 
+        height: auto !important; 
+        aspect-ratio: 1 / 1 !important; /* 고정픽셀이 아닌 비율(1:1 정사각)로 자동 조절 */
+        min-height: 0 !important;
         padding: 0 !important; margin: 0 auto !important; display: flex !important; align-items: center !important; justify-content: center !important;
     }
-    div[data-testid="stHorizontalBlock"]:has(> div:nth-child(7)) .stButton > button p { color: #111111 !important; font-size: 13px !important; white-space: nowrap !important; }
+    div[data-testid="stHorizontalBlock"]:has(> div:nth-child(7)) .stButton > button p { color: #111111 !important; font-size: 12px !important; white-space: nowrap !important; }
     div[data-testid="stHorizontalBlock"]:has(> div:nth-child(7)) .stButton > button[kind="primary"] { background-color: #D0E2F5 !important; border: 2px solid #0A84FF !important; }
 
     .stButton > button:has(p:contains("＜")), .stButton > button:has(p:contains("＞")) { background-color: transparent !important; border: none !important; height: 35px !important; }
 
     /* 하단 네비게이션 탭바 */
     .stButton > button:has(p:contains("🏠")), .stButton > button:has(p:contains("📊")), .stButton > button:has(p:contains("🧸")), .stButton > button:has(p:contains("👤")) {
-        background-color: #FFFFFF !important; border-radius: 0 !important; height: 80px !important; border-top: 1px solid #EEEEEE !important; margin-bottom: -15px !important;
+        background-color: #FFFFFF !important; border-radius: 0 !important; height: 70px !important; border-top: 1px solid #EEEEEE !important; margin-bottom: 0 !important;
     }
     .stButton > button:has(p:contains("🏠")) p, .stButton > button:has(p:contains("📊")) p, .stButton > button:has(p:contains("🧸")) p, .stButton > button:has(p:contains("👤")) p {
-        font-size: 32px !important; color: #111111 !important;
-    }
-
-    /* ==============================================================
-       🚨 [핵심] 스마트폰 모바일 화면 강제 가로 유지 및 최적화 🚨
-       ============================================================== */
-    @media (max-width: 768px) {
-        /* 모바일에서 달력이나 네비게이션이 세로로 무너지는 것 완벽 방지 */
-        div[data-testid="stHorizontalBlock"] {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-        }
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-            min-width: 0 !important; /* 컬럼이 강제로 줄어들 수 있게 허용 */
-            width: auto !important;
-        }
-        /* 스마트폰 화면 꽉 채우기 (여백 및 테두리 제거) */
-        .block-container {
-            max-width: 100% !important;
-            margin: 0 !important;
-            border: none !important;
-            border-radius: 0 !important;
-            padding: 1rem 0.5rem 0 0.5rem !important;
-        }
+        font-size: 28px !important; color: #111111 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -160,7 +152,7 @@ def view_home():
     cols = st.columns(7)
     for i, d in enumerate(days_header):
         color = "#FF3B30" if d == "일" else "#8E8E93"
-        cols[i].markdown(f"<div style='text-align:center; color:{color}; font-size:14px; font-weight:bold; margin-bottom:10px;'>{d}</div>", unsafe_allow_html=True)
+        cols[i].markdown(f"<div style='text-align:center; color:{color}; font-size:13px; font-weight:bold; margin-bottom:10px;'>{d}</div>", unsafe_allow_html=True)
     
     for week in month_days:
         cols = st.columns(7)
@@ -202,8 +194,8 @@ def view_home():
                 <h4 style="margin:0; font-size:16px;">{display_title}</h4>
                 <span style="color: {badge_color}; padding: 4px 10px; border-radius: 12px; font-size: 12px; border: 1px solid {badge_color};">{badge_text}</span>
             </div>
-            <p style="color:#666666; margin-top:15px; margin-bottom:5px;">감정 상태</p>
-            <p style="color:{badge_color}; font-weight:bold; margin-top:0;">{level}</p>
+            <p style="color:#666666; margin-top:15px; margin-bottom:5px; font-size:14px;">감정 상태</p>
+            <p style="color:{badge_color}; font-weight:bold; margin-top:0; font-size:16px;">{level}</p>
         </div>
         """, unsafe_allow_html=True)
         with st.expander("📝 작성한 일기 전문 보기"): st.write(text)
@@ -246,7 +238,7 @@ def view_report():
         act3 = sel_data.get('action3', '시원한 물 한잔 마시기')
         
         st.info(f"조회 기준: {m}월 {d}일")
-        st.markdown(f"<div class='light-card'><p style='color:#666; margin:0;'>우울증 단계 결과</p><h2 style='color:#0A84FF; margin-top:5px; font-size:22px;'>{level}</h2></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='light-card'><p style='color:#666; margin:0; font-size:14px;'>우울증 단계 결과</p><h2 style='color:#0A84FF; margin-top:5px; font-size:20px;'>{level}</h2></div>", unsafe_allow_html=True)
         st.markdown("<div style='margin-top:20px; margin-bottom:5px; color:#111; font-weight:bold;'>📊 감정 변화 추이</div>", unsafe_allow_html=True)
         
         period = st.selectbox("기간 선택", ["최근 7일", "최근 30일"], label_visibility="collapsed")
@@ -277,11 +269,11 @@ def view_report():
             
         st.markdown(f"""
         <div class='light-card' style='margin-top:10px;'>
-            <p style='color:#666; margin:0;'>AI 심리 분석 결과</p>
+            <p style='color:#666; margin:0; font-size:14px;'>AI 심리 분석 결과</p>
             <p style='font-size:14px; margin-top:10px;'>{reason}</p>
             <hr style='border-color:#EEE;'>
-            <p style='color:#666; margin:0;'>AI 맞춤 추천 활동</p>
-            <ul style='font-size:14px; margin-top:10px; color:#333; line-height: 1.6;'>
+            <p style='color:#666; margin:0; font-size:14px;'>AI 맞춤 추천 활동</p>
+            <ul style='font-size:14px; margin-top:10px; color:#333; line-height: 1.6; padding-left:20px;'>
                 <li>{act1}</li><li>{act2}</li><li>{act3}</li>
             </ul>
         </div>""", unsafe_allow_html=True)
@@ -327,7 +319,8 @@ def view_login_signup():
 # ==========================================
 # 5. 메인 레이아웃 적용
 # ==========================================
-main_content_area = st.container(height=650, border=False)
+# [해결2] 높이(height=650) 제한을 완전히 제거하여 아이폰 SE에서도 아래가 잘리지 않도록 함
+main_content_area = st.container(border=False) 
 
 with main_content_area:
     if not st.session_state.logged_in: view_login_signup()
